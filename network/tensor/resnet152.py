@@ -1,4 +1,4 @@
-from tensorflow.keras import applications, optimizers
+from tensorflow.keras import applications
 from tensorflow.keras.applications.ResNet152 import preprocess_input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
@@ -36,11 +36,11 @@ def training(batch_size: int, lr, opt, loss_func):
     for layer in base_model.layers:
         layer.trainable = False
 
-    model.compile(optimizer=optimizers.Adam(lr=lr),
+    model.compile(optimizer=opt(lr=lr),
                   metrics=['accuracy'],
                   loss='categorical_crossentropy')
     # model.summary()
-    top_layers_file_path = "model.hdf5"
+    top_layers_file_path = "resnet152.hdf5"
 
     # Defining the callbacks for the model
     checkpoint = ModelCheckpoint(top_layers_file_path,

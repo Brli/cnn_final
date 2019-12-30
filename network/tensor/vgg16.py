@@ -1,5 +1,5 @@
 from tensorflow.keras import applications
-from tensorflow.keras.applications.inception_v3 import preprocess_input
+from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
@@ -22,11 +22,11 @@ def training(batch_size: int, lr, opt, loss_func):
     test_flow = preprocess(sampling("test"), preprocess_input,
                            HEIGHT, WIDTH, batch_size)
 
-    # Loading the inceptionV3 model and adjusting last layers
+    # Loading the resnet152 model and adjusting last layers
 
-    base_model = applications.InceptionV3(weights='imagenet',
-                                          include_top=False,
-                                          input_shape=(WIDTH, HEIGHT, 3))
+    base_model = applications.VGG16(weights='imagenet',
+                                    include_top=False,
+                                    input_shape=(WIDTH, HEIGHT, 3))
     x = base_model.output
     x = GlobalAveragePooling2D()(x)
     x = Dense(128, activation='relu')(x)
@@ -40,7 +40,7 @@ def training(batch_size: int, lr, opt, loss_func):
                   metrics=['accuracy'],
                   loss='categorical_crossentropy')
     # model.summary()
-    top_layers_file_path = "inception_v3.hdf5"
+    top_layers_file_path = "vgg16.hdf5"
 
     # Defining the callbacks for the model
     checkpoint = ModelCheckpoint(top_layers_file_path,
