@@ -63,5 +63,5 @@ def training(batch_size: int, lr, opt, loss_func):
                         steps_per_epoch=math.ceil(train_flow.samples/train_flow.batch_size),
                         callbacks=[checkpoint, early],
                         validation_data=(test_flow))
-
+    postprocess(history)
     return history
