@@ -9,24 +9,19 @@ from libs.pre_processing import preprocess
 from libs.post_processing import postprocess
 import math
 
-
 WIDTH = 299
 HEIGHT = 299
-batch_size = 8
-
-train_dir = sampling("train")
-test_dir = sampling("test")
 
 
 def training(batch_size: int, lr, opt, loss_func):
     # Train DataSet Generator with Augmentation
     print("\nTraining Data Set")
-    train_flow = preprocess(train_dir, preprocess_input,
-                               HEIGHT, WIDTH, batch_size)
+    train_flow = preprocess(sampling("train"), preprocess_input,
+                            HEIGHT, WIDTH, batch_size)
     # Test DataSet Generator with Augmentation
     print("\nTest Data Set")
-    test_flow = preprocess(test_dir, preprocess_input,
-                              HEIGHT, WIDTH, batch_size)
+    test_flow = preprocess(sampling("test"), preprocess_input,
+                           HEIGHT, WIDTH, batch_size)
 
     # Loading the inceptionV3 model and adjusting last layers
 
