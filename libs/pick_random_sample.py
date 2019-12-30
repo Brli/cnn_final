@@ -22,13 +22,11 @@ def __init__(self, act: str, sample_size: int):
     for cls in classes:
         target_dir = join("samples", act)
         if isdir(target_dir):
+        # Clear the exist directory before we start sampling
             rmtree(target_dir)
-            makedirs(target_dir)
-            for x in range(0, img_number):
-                samples = random.choice(listdir(join(src_dir, cls)))
-                copy(join(src_dir, cls, samples), join(target_dir, cls, samples))
-        else:
-            makedirs(target_dir)
-            for x in range(0, img_number):
-                samples = random.choice(listdir(join(src_dir, cls)))
-                copy(join(src_dir, cls, samples), join(target_dir, cls, samples))
+        # We pick the "img_number" amount of samples
+        # NOTE: that the number may be less, since we didn't deal with redundency
+        makedirs(target_dir)
+        for x in range(0, img_number):
+            samples = random.choice(listdir(join(src_dir, cls)))
+            copy(join(src_dir, cls, samples), join(target_dir, cls, samples))
