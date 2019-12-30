@@ -12,7 +12,7 @@ import math
 
 WIDTH = 299
 HEIGHT = 299
-BATCH_SIZE = 8
+batch_size = 8
 
 train_dir = sampling("train")
 test_dir = sampling("test")
@@ -22,11 +22,11 @@ def training(batch_size: int, lr, opt, loss_func):
     # Train DataSet Generator with Augmentation
     print("\nTraining Data Set")
     train_flow = preprocess(train_dir, preprocess_input,
-                               HEIGHT, WIDTH, BATCH_SIZE)
+                               HEIGHT, WIDTH, batch_size)
     # Test DataSet Generator with Augmentation
     print("\nTest Data Set")
     test_flow = preprocess(test_dir, preprocess_input,
-                              HEIGHT, WIDTH, BATCH_SIZE)
+                              HEIGHT, WIDTH, batch_size)
 
     # Loading the inceptionV3 model and adjusting last layers
 
@@ -42,7 +42,7 @@ def training(batch_size: int, lr, opt, loss_func):
     for layer in base_model.layers:
         layer.trainable = False
 
-    model.compile(optimizer=optimizers.Adam(lr=0.001),
+    model.compile(optimizer=optimizers.Adam(lr=lr),
                   metrics=['accuracy'],
                   loss='categorical_crossentropy')
     # model.summary()
@@ -60,7 +60,8 @@ def training(batch_size: int, lr, opt, loss_func):
     history = model.fit(train_flow,
                         epochs=20,
                         verbose=1,
-                        steps_per_epoch=math.ceil(train_flow.samples/train_flow.batch_size),
+                        steps_per_epoch=math.ceil(
+                            train_flow.samples/train_flow.batch_size),
                         callbacks=[checkpoint, early],
                         validation_data=(test_flow))
     postprocess(history)
