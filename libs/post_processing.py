@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 
 
-def postprocess(history):
+def postprocess(history, name):
     # Plot training accuracy values
     plt.plot(history.history['accuracy'])
     plt.plot(history.history['val_accuracy'])
@@ -9,7 +9,7 @@ def postprocess(history):
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
+    plt.savefig("./", name, "/accuracy.png")
 
     # Plot training loss values
     plt.plot(history.history['loss'])
@@ -18,4 +18,4 @@ def postprocess(history):
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.show()
+    plt.savefig("./", name, "/loss.png")

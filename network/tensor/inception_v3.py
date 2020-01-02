@@ -11,8 +11,7 @@ import math
 WIDTH = 299
 HEIGHT = 299
 
-
-def training(batch_size: int, lr, opt, loss_func):
+def training(self, batch_size: int, lr, opt, loss_func):
     # Train DataSet Generator with Augmentation
     print("\nTraining Data Set")
     train_flow = preprocess(sampling("train"), preprocess_input,
@@ -40,7 +39,7 @@ def training(batch_size: int, lr, opt, loss_func):
                   metrics=['accuracy'],
                   loss='categorical_crossentropy')
     # model.summary()
-    top_layers_file_path = "inception_v3.hdf5"
+    top_layers_file_path = "model.hdf5"
 
     # Defining the callbacks for the model
     checkpoint = ModelCheckpoint(top_layers_file_path,
@@ -58,5 +57,7 @@ def training(batch_size: int, lr, opt, loss_func):
                             train_flow.samples/train_flow.batch_size),
                         callbacks=[checkpoint, early],
                         validation_data=(test_flow))
-    postprocess(history)
-    return history
+    # Save the model
+    history.save('../inception_v3.hdf5')
+    # Plot the model
+    postprocess(history, self.__name__)
