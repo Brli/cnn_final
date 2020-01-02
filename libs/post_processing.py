@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from os.path import join
 
 
 def postprocess(history, name):
@@ -9,7 +10,7 @@ def postprocess(history, name):
     plt.ylabel('Accuracy')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig("./", name, "/accuracy.png")
+    plt.savefig(join("../", name, "/accuracy.png"))
 
     # Plot training loss values
     plt.plot(history.history['loss'])
@@ -18,4 +19,4 @@ def postprocess(history, name):
     plt.ylabel('Loss')
     plt.xlabel('Epoch')
     plt.legend(['Train', 'Test'], loc='upper left')
-    plt.savefig("./", name, "/loss.png")
+    plt.savefig(join("../", name, "/loss.png"))
