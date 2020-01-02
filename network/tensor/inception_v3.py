@@ -11,7 +11,7 @@ import math
 WIDTH = 299
 HEIGHT = 299
 
-def training(self, batch_size: int, lr, opt, loss_func):
+def training(batch_size: int, lr, opt, loss_func):
     # Train DataSet Generator with Augmentation
     print("\nTraining Data Set")
     train_flow = preprocess(sampling("train"), preprocess_input,
@@ -58,6 +58,6 @@ def training(self, batch_size: int, lr, opt, loss_func):
                         callbacks=[checkpoint, early],
                         validation_data=(test_flow))
     # Save the model
-    history.save('../inception_v3.hdf5')
+    model.save('../inception_v3.hdf5')
     # Plot the model
-    postprocess(history, self.__name__)
+    postprocess(history, "inception_v3")
