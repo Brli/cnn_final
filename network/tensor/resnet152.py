@@ -1,5 +1,5 @@
 from tensorflow.keras import applications
-from tensorflow.keras.applications.ResNet152 import preprocess_input
+from tensorflow.keras.applications.resnet import preprocess_input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
 from tensorflow.keras.models import Model
