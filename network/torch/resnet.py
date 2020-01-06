@@ -35,13 +35,13 @@ import torch.utils.data as Data
 
 
 traindict = {0 : 'buildings', 1 : 'forest', 2 : 'glacier', 3 : 'mountain', 4 : 'sea', 5 : 'street'}
-traindict
+# traindict
 
 
 
-n_img = 75
+n_img = 100
 train = pd.DataFrame([0] * n_img + [1] * n_img + [2] * n_img + [3] * n_img + [4] * n_img + [5] * n_img)
-train
+# train
 
 
 
@@ -49,7 +49,7 @@ train
 train_img = []
 for i in range(0, 6):
     # defining the image path
-    image_path = 'intel-image-classification/seg_test/seg_test/%s/'%traindict[i] # Jay/Jay/%d.jpg'%i
+    image_path = 'data/train/%s/'%traindict[i] # Jay/Jay/%d.jpg'%i
 
     files = listdir(image_path)
 
@@ -72,17 +72,9 @@ train_y = train[0].values
 train_x.shape, train_y.shape
 
 
-
-print(train_y[125])
-plt.imshow(train_x[125])
-
-
-
 # create validation set
 train_x, test_x, train_y, test_y = train_test_split(train_x, train_y, test_size = 0.2, random_state = 13, stratify=train_y)
 train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size = 0.3, random_state = 13, stratify=train_y)
-(train_x.shape, train_y.shape), (val_x.shape, val_y.shape), (test_x.shape, test_y.shape)
-
 
 
 # settings of data augmentation for train_x & val_x
@@ -98,7 +90,7 @@ transform_train = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(train_rgb_mean, train_rgb_std),
 ])
-print(train_rgb_mean, train_rgb_std)
+# print(train_rgb_mean, train_rgb_std)
 
 # valid, settings should be same as training
 transform_valid = transforms.Compose([
@@ -122,9 +114,7 @@ train_y = train_y.astype(int)
 train_y = torch.from_numpy(train_y)
 
 # shape of training data
-train_x.shape, train_y.shape
-
-
+# train_x.shape, train_y.shape
 
 # converting validation images into torch format
 val_x = val_x.reshape(val_x.shape[0], val_x.shape[3], val_x.shape[1], val_x.shape[2])
@@ -135,9 +125,7 @@ val_y = val_y.astype(int)
 val_y = torch.from_numpy(val_y)
 
 # shape of validation data
-val_x.shape, val_y.shape
-
-
+# val_x.shape, val_y.shape
 
 # converting testing images into torch format
 test_x = test_x.reshape(test_x.shape[0], test_x.shape[3], test_x.shape[1], test_x.shape[2])
@@ -148,24 +136,22 @@ test_y = test_y.astype(int)
 test_y = torch.from_numpy(test_y)
 
 # shape of training data
-test_x.shape, test_y.shape
-
-
+# test_x.shape, test_y.shape
 
 # do data augmentation
 # transformed_train_x = torch.zeros(train_x.size())
 # transformed_val_x = torch.zeros(val_x.size())
 
 # train
-# print(train_x[0])
+# # print(train_x[0])
 for i in range(len(train_x)):
 #     transformed_train_x[i] = transform_train(train_x[i])
     train_x = torch.cat((train_x, transform_train(train_x[i]).unsqueeze(0)), 0) # append transformed images into old train
 
 train_y = torch.cat((train_y,train_y), 0) # double train_y
-# print(train_x[0])
-# print(train_x[120])
-print(train_x.size(), train_y.size())
+# # print(train_x[0])
+# # print(train_x[120])
+# print(train_x.size(), train_y.size())
 
 
 # valid
@@ -173,12 +159,9 @@ for i in range(len(val_x)):
     val_x = torch.cat((val_x, transform_valid(val_x[i]).unsqueeze(0)), 0) # append transformed images into old valid
 
 val_y = torch.cat((val_y,val_y), 0) # double val_y
-# print(train_x[0])
-# print(train_x[120])
-print(val_x.size(), val_y.size())
-
- [markdown]
-# # ResNet18
+# # print(train_x[0])
+# # print(train_x[120])
+# print(val_x.size(), val_y.size())
 
 
 # loading the pretrained model
@@ -188,7 +171,7 @@ model = models.resnet18(pretrained=True)
 # Freeze model weights
 for param in model.parameters():
     param.requires_grad = False
-print(model)
+# print(model)
 
 
 
@@ -224,7 +207,7 @@ ignored_params = list(map(id, model.fc.parameters()))
 base_params = filter(lambda x: id(x) not in ignored_params, model.parameters())
 params_list = [{'params': base_params, 'lr': 0.0001},]
 params_list.append({'params': model.fc.parameters(), 'lr': 0.0001})
-# print(model)
+# # print(model)
 
 
 
@@ -240,8 +223,6 @@ if torch.cuda.is_available():
 
 
 # Training the model
-
-
 def fit(epoch, model, data_x, data_y, batch_size = 8, phase = 'training', volatile = False):
     if phase == 'training':
         model.train()
@@ -280,15 +261,15 @@ def fit(epoch, model, data_x, data_y, batch_size = 8, phase = 'training', volati
 
     loss = np.average(losses)
     accuracy = correct / len(data_y)
-    print('epoch: {}, {} loss is {:8.4f} and {} accuracy is {:8.4f}'.format(epoch, phase,
-                                                                    loss, phase, accuracy))
+    # print('epoch: {}, {} loss is {:8.4f} and {} accuracy is {:8.4f}'.format(epoch, phase,
+    #                                                                loss, phase, accuracy))
     return loss, accuracy
 
 
 # batch size of the model
 batch_size = 32
 # number of epochs to train the model
-epoches = 5
+epoches = 15
 
 train_losses, train_accuracy = [], []
 val_losses, val_accuracy = [], []
@@ -296,13 +277,13 @@ start = time.time()
 for epoch in range(0, epoches):
     epoch_loss, epoch_accuracy = fit(epoch, model, train_x, train_y, batch_size, phase = 'training')
     val_epoch_loss, val_epoch_accuracy = fit(epoch, model, val_x, val_y, batch_size, phase = 'validation')
-    print('=' * 10)
+    # print('=' * 10)
     train_losses.append(epoch_loss)
     train_accuracy.append(epoch_accuracy)
     val_losses.append(val_epoch_loss)
     val_accuracy.append(val_epoch_accuracy)
 end = time.time()
-print("Training time: " + str(end - start))
+# print("Training time: " + str(end - start))
 
 
 ### 觀察loss & accuracy
@@ -342,18 +323,18 @@ for i in tqdm(range(0, test_x.size()[0], batch_size)):
     prediction_test.append(preds)
     target_test.append(batch_y)
 
-for i in range(len(target_test)):
-    print(target_test[i])
-    print(prediction_test[i].view(-1))
-    print("--" * 10)
-print()
-print('testing accuracy: ', (correct/len(test_y)))
+#for i in range(len(target_test)):
+    # print(target_test[i])
+    # print(prediction_test[i].view(-1))
+    # print("--" * 10)
+# print()
+# print('testing accuracy: ', (correct/len(test_y)))
 
 
 ### 預測結果
-print("Real value", batch_y[-1])
-print("Predicted value", preds[-1])
-plt.imshow(batch_x[-1].reshape(224, 224, 3))
+# print("Real value", batch_y[-1])
+# print("Predicted value", preds[-1])
+plt.imshow(batch_x[-1].cpu().reshape(224, 224, 3))
 
 
 # loading training images
@@ -394,8 +375,8 @@ with torch.no_grad():
 
 preds_img = pred_img.data.max(dim = 1, keepdim = True)[1]
 for i in range(len(preds_img)):
-    print("class ", int(preds_img[i]), " : ", traindict[int(preds_img[i])])
+    # print("class ", int(preds_img[i]), " : ", traindict[int(preds_img[i])])
     plt.imshow(test_img[i].reshape(224, 224, 3))
     plt.axis('off')
     plt.show()
-    print("==" * 10)
+    # print("==" * 10)
