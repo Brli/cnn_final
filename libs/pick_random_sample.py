@@ -14,7 +14,6 @@ def sampling(act: str, sample_size=50):
 
     src_dir = join("data", act)
     classes = listdir(src_dir)
-    # sample size should be tunable out of scope
     print("The Classes of images are as follows: ")
     print(', '.join(classes))
 
@@ -26,7 +25,6 @@ def sampling(act: str, sample_size=50):
     # samples/ stores the following sampled images
     # act is train or test
     # class name is the name of image set
-    img_number = sample_size
     target_dir = join("samples", act)
     if isdir(target_dir):
         # Clear the exist directory before we start sampling
@@ -36,7 +34,7 @@ def sampling(act: str, sample_size=50):
         # We pick the "img_number" amount of samples
         # NOTE: the number may be less, since we didn't deal with redundency
         makedirs(join(target_dir, cls))
-        for x in range(0, img_number):
+        for x in range(0, sample_size):
             samples = random.choice(listdir(join(src_dir, cls)))
             copy(join(src_dir, cls, samples), join(target_dir, cls, samples))
 
