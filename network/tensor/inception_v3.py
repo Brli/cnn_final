@@ -1,3 +1,4 @@
+"""InceptionResnetV2 Default model from Tensorflow 2.0."""
 from tensorflow.keras import applications
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
@@ -13,7 +14,7 @@ HEIGHT = 299
 
 
 def training(batch_size: int, lr, opt, loss_func):
-    # Train DataSet Generator with Augmentation
+    """Train DataSet Generator with Augmentation."""
     print("\nTraining Data Set")
     train_flow = preprocess(sampling("train"), preprocess_input,
                             HEIGHT, WIDTH, batch_size)
@@ -39,7 +40,6 @@ def training(batch_size: int, lr, opt, loss_func):
     model.compile(optimizer=opt(lr=lr),
                   metrics=['accuracy'],
                   loss='categorical_crossentropy')
-    # model.summary()
     top_layers_file_path = "model.hdf5"
 
     # Defining the callbacks for the model
