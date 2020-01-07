@@ -322,7 +322,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
                  ha='center',
                  va='bottom')
     plt.savefig("../resnet18_"+str(augmentation)+"_accuracy.png")
-
+    plt.clf()
 
     # prediction for tetsing set
     prediction_test = []
