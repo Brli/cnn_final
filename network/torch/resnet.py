@@ -68,33 +68,29 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     train_x, test_x, train_y, test_y = train_test_split(train_x, train_y, test_size = 0.2, random_state = 13, stratify=train_y)
     train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size = 0.3, random_state = 13, stratify=train_y)
 
+    """setup augmentation methods"""
+    def transform_method(horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True):
+        transform_list=[]
+        transform_list.append(transforms.ToPILImage())
+        if horizontal_flip:
+            transform_list.append(transforms.RandomHorizontalFlip(p=0.5))
+        if vertical_flip:
+            transform_list.append(transforms.RandomVerticalFlip(p=0.5))
+        if rotate:
+            transform_list.append(transforms.RandomRotation(degrees = (30,60)))
+        if color_jitt: # Randomly change the brightness, contrast and saturation of an image
+            transform_list.append(transforms.ColorJitter(brightness=10, contrast=10, saturation=10))
+        if normalize:
+            transform_list.append(transforms.Normalize(train_rgb_mean, train_rgb_std))
+        transform_list.append(transforms.ToTensor())
+        return transform_list
+    # train
+    train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
+    train_rgb_std = list(train_x.std(axis = (0,1,2)))
+    transform_train = transforms.Compose(transform_method())
 
-    """settings of data augmentation for train_x & val_x"""
-    if augmentation == True:
-        # train
-        train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
-        train_rgb_std = list(train_x.std(axis = (0,1,2)))
-        transform_train = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomHorizontalFlip(p=0.5),
-        #     transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomRotation(degrees = (30,60)),
-            transforms.ColorJitter(brightness=10, contrast=10, saturation=10), # Randomly change the brightness, contrast and saturation of an image
-            transforms.ToTensor(),
-            transforms.Normalize(train_rgb_mean, train_rgb_std),
-        ])
-        # print(train_rgb_mean, train_rgb_std)
-
-        # valid, settings should be same as training
-        transform_valid = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomHorizontalFlip(p=0.5),
-        #     transforms.RandomVerticalFlip(p=0.5),
-            transforms.RandomRotation(degrees = (30,60)),
-            transforms.ColorJitter(brightness=10, contrast=10, saturation=10), # Randomly change the brightness, contrast and saturation of an image
-            transforms.ToTensor(),
-            transforms.Normalize(train_rgb_mean, train_rgb_std), # using train_rgb_mean、train_rgb_std, same as training
-        ])
+    # valid, settings should be same as training
+    transform_valid = transforms.Compose(transform_method())
 
 
     # converting training images into torch format
@@ -130,42 +126,24 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     # shape of training data
     # test_x.shape, test_y.shape
 
-    # do data augmentation
-    # transformed_train_x = torch.zeros(train_x.size())
-    # transformed_val_x = torch.zeros(val_x.size())
+    """do data augmentation"""
+    if augmentation == True:
+        # train
+        for i in range(len(train_x)):
+            train_x = torch.cat((train_x, transform_train(train_x[i]).unsqueeze(0)), 0) # append transformed images into old train
+        train_y = torch.cat((train_y,train_y), 0) # double train_y
 
-    # train
-    # # print(train_x[0])
-    for i in range(len(train_x)):
-    #     transformed_train_x[i] = transform_train(train_x[i])
-        train_x = torch.cat((train_x, transform_train(train_x[i]).unsqueeze(0)), 0) # append transformed images into old train
-
-    train_y = torch.cat((train_y,train_y), 0) # double train_y
-    # # print(train_x[0])
-    # # print(train_x[120])
-    # print(train_x.size(), train_y.size())
-
-
-    # valid
-    for i in range(len(val_x)):
-        val_x = torch.cat((val_x, transform_valid(val_x[i]).unsqueeze(0)), 0) # append transformed images into old valid
-
-    val_y = torch.cat((val_y,val_y), 0) # double val_y
-    # # print(train_x[0])
-    # # print(train_x[120])
-    # print(val_x.size(), val_y.size())
+        # valid
+        for i in range(len(val_x)):
+            val_x = torch.cat((val_x, transform_valid(val_x[i]).unsqueeze(0)), 0) # append transformed images into old valid
+        val_y = torch.cat((val_y,val_y), 0) # double val_y
 
 
     # loading the pretrained model
     model = models.resnet18(pretrained=True)
-    # model = resnet18(pretrained=True)
-
     # Freeze model weights
     for param in model.parameters():
         param.requires_grad = False
-    # print(model)
-
-
 
     # Reset the final fc layer
     fc = model.fc
@@ -352,9 +330,8 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
         print("--" * 10)
     print()
     print('testing accuracy: ', (correct/len(test_y)))
-    f = open("restnet"+str(augmentation)+".log", "a+")
-    f.write(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
-    f.close()
+    with open('restnet'+str(augmentation)+'.log', 'a+', encoding='utf-8') as log:
+        log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
     torch.cuda.empty_cache()
 
 
