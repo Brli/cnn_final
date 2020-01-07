@@ -352,7 +352,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
         print("--" * 10)
     print()
     print('testing accuracy: ', (correct/len(test_y)))
-    f = open("restnet.log", "a+")
+    f = open("restnet"+str(augmentation)+".log", "a+")
     f.write(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
     f.close()
     torch.cuda.empty_cache()
