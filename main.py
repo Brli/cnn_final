@@ -20,13 +20,14 @@ def base():
     base.close()
 
 def exec_resnet(augmentation=True):
+    def func():
+        resnet.bulk_train(augmentation=augmentation)
+    exec_resnet = timeit.repeat(func, repeat=5)
     resnet18 = open("resnet18_"+str(augmentation)+".csv", 'a+')
-    resnet18.write("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss\n")
-    exec_resnet = timeit.repeat(resnet.bulk_train, repeat=5)
-    resnet18.write(str(mean(exec_resnet))+",")
+    resnet18.writelines("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss")
     resnet_log = pandas.read_csv('resnet.log',
                                 names=['accuracy', 'val_accuracy', 'loss', 'val_loss'])
-    resnet18.write(str(mean(resnet_log['accuracy'].values))+","+str(mean(resnet_log['val_accuracy'].values))+","+str(mean(resnet_log['loss'].values))+","+str(mean(resnet_log['val_loss'].values))+"\n")
+    resnet18.write(str(mean(exec_resnet))+","+str(mean(resnet_log['accuracy'].values))+","+str(mean(resnet_log['val_accuracy'].values))+","+str(mean(resnet_log['loss'].values))+","+str(mean(resnet_log['val_loss'].values))+"\n")
     resnet18.close()
 
 def incv3():
@@ -36,10 +37,9 @@ def log_inceptionv3():
     inceptionv3 = open("inceptionv3", 'a+')
     inceptionv3.write("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss\n")
     exec_inv3 = timeit.repeat(incv3, repeat=5)
-    inceptionv3.write(str(mean(exec_inv3))+",")
     inceptionv3_log = pandas.read_csv('inception_v3.log',
                                 names=['accuracy', 'val_accuracy', 'loss', 'val_loss'])
-    inceptionv3.write(str(mean(inceptionv3_log['accuracy'].values))+","+str(mean(inceptionv3_log['val_accuracy'].values))+","+str(mean(inceptionv3_log['loss'].values))+","+str(mean(inceptionv3_log['val_loss'].values))+"\n")
+    inceptionv3.write(str(mean(exec_inv3))+","+str(mean(inceptionv3_log['accuracy'].values))+","+str(mean(inceptionv3_log['val_accuracy'].values))+","+str(mean(inceptionv3_log['loss'].values))+","+str(mean(inceptionv3_log['val_loss'].values))+"\n")
     inceptionv3.close()
 
 exec_resnet()
