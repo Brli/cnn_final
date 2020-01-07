@@ -24,11 +24,21 @@ def postprocess(history, name: str, plot_type: str):
     val_plot_type_object = history.history['val_' + plot_type]
     plot_type_object = history.history[plot_type]
     last_id = len(plot_type_object) - 1
-    label = "({}, {:.2f})".format(len(history.epoch),
-                                  plot_type_object[last_id])
-    plt.annotate(label,  # this is the text
+    label_type = "({}, {:.2f})".format(len(history.epoch),
+                                plot_type_object[last_id])
+    plt.annotate(label_type,  # this is the text
                  xy=(len(history.epoch),
                      plot_type_object[last_id]),  # this is the point to label
+                 textcoords="offset points",  # how to position the text
+                 xytext=(0, 10),  # distance from text to points (x,y)
+                 ha='center',
+                 va='bottom')
+
+    label_val_type = "({}, {:.2f})".format(len(history.epoch),
+                                    val_plot_type_object[last_id])
+    plt.annotate(label_val_type,  # this is the text
+                 xy=(len(history.epoch),
+                     val_plot_type_object[last_id]),  # this is the point to label
                  textcoords="offset points",  # how to position the text
                  xytext=(0, 10),  # distance from text to points (x,y)
                  ha='center',
