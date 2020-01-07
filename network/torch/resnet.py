@@ -127,7 +127,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     # test_x.shape, test_y.shape
 
     """do data augmentation"""
-    if augmentation == True:
+    if augmentation:
         # train
         for i in range(len(train_x)):
             train_x = torch.cat((train_x, transform_train(train_x[i]).unsqueeze(0)), 0) # append transformed images into old train
