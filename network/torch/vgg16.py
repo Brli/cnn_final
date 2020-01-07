@@ -39,7 +39,7 @@ train
 train_img = []
 for i in range(0, 6):
     # defining the image path
-    image_path = 'intel-image-classification/seg_test/%s/'%traindict[i] # Jay/Jay/%d.jpg'%i
+    image_path = 'data/train/%s/'%traindict[i] # Jay/Jay/%d.jpg'%i
 
     files = listdir(image_path)
 
