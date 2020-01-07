@@ -288,14 +288,14 @@ end = time.time()
 
 ### 觀察loss & accuracy
 plt.figure(1)
-plt.plot(train_losses, 'bo', label = 'training loss')
-plt.plot(val_losses, 'r', label = 'validation loss')
+plt.plot(train_losses, 'r', label = 'training loss')
+plt.plot(val_losses, 'bo', label = 'validation loss')
 plt.title("Loss")
 plt.legend()
 
 plt.figure(2)
-plt.plot(train_accuracy, 'bo', label = 'training accuracy')
-plt.plot(val_accuracy, 'r', label = 'validation accuracy')
+plt.plot(train_accuracy, 'r', label = 'training accuracy')
+plt.plot(val_accuracy, 'bo', label = 'validation accuracy')
 plt.title("Accuracy")
 plt.legend()
 plt.show()
@@ -339,7 +339,7 @@ plt.imshow(batch_x[-1].cpu().reshape(224, 224, 3))
 
 # loading training images
 test_img = []
-image_path =  'chart/testdata/'
+image_path =  'data/pred/'
 files = listdir(image_path)
 
 for f in files[0:n_img]:
@@ -375,8 +375,8 @@ with torch.no_grad():
 
 preds_img = pred_img.data.max(dim = 1, keepdim = True)[1]
 for i in range(len(preds_img)):
-    # print("class ", int(preds_img[i]), " : ", traindict[int(preds_img[i])])
-    plt.imshow(test_img[i].reshape(224, 224, 3))
+    print("class ", int(preds_img[i]), " : ", traindict[int(preds_img[i])])
+    plt.imshow(test_img[i].cpu().reshape(224, 224, 3))
     plt.axis('off')
     plt.show()
     # print("==" * 10)
