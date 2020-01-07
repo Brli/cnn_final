@@ -63,6 +63,5 @@ def training(batch_size: int, lr, opt, loss_func, epoch=25, sample_size=100):
     # Save the model
     model.save('../inception_v3.hdf5')
     # Save log
-    file = open("inception_v3.log", 'a+')
-    file.write(history.history["accuracy"][epoch-1]+","+history.history["val_accuracy"][epoch-1]+","+history.history["loss"][epoch-1]+","+history.history["val_loss"][epoch-1]+"\n")
-    file.close()
+    with open("inception_v3.log", 'a+', encoding='utf-8') as log:
+        log.writelines(history.history["accuracy"]+"\n"+history.history["val_accuracy"]+"\n"+history.history["loss"]+"\n"+history.history["val_loss"])
