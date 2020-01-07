@@ -13,14 +13,14 @@ WIDTH = 299
 HEIGHT = 299
 
 
-def training(batch_size: int, lr, opt, loss_func):
+def training(batch_size: int, lr, opt, loss_func, sample_size=100):
     """Train DataSet Generator with Augmentation."""
     print("\nTraining Data Set")
-    train_flow = preprocess(sampling("train"), preprocess_input,
+    train_flow = preprocess(sampling("train", sample_size), preprocess_input,
                             HEIGHT, WIDTH, batch_size)
     # Test DataSet Generator with Augmentation
     print("\nTest Data Set")
-    test_flow = preprocess(sampling("test"), preprocess_input,
+    test_flow = preprocess(sampling("test", sample_size), preprocess_input,
                            HEIGHT, WIDTH, batch_size)
 
     # Loading the InceptionResNetV2 model and adjusting last layers

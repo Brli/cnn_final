@@ -13,8 +13,9 @@ WIDTH = 299
 HEIGHT = 299
 
 
-def training(batch_size: int, lr, opt, loss_func):
-    """Train DataSet Generator with Augmentation."""
+def training(batch_size: int, lr, opt, loss_func, epoch=25, sample_size=100):
+    """Augmentation"""
+    # Train DataSet Generator with Augmentation
     print("\nTraining Data Set")
     train_flow = preprocess(sampling("train"), preprocess_input,
                             HEIGHT, WIDTH, batch_size)
@@ -24,7 +25,6 @@ def training(batch_size: int, lr, opt, loss_func):
                            HEIGHT, WIDTH, batch_size)
 
     # Loading the inceptionV3 model and adjusting last layers
-
     base_model = applications.InceptionV3(weights='imagenet',
                                           include_top=False,
                                           input_shape=(WIDTH, HEIGHT, 3))
@@ -48,11 +48,11 @@ def training(batch_size: int, lr, opt, loss_func):
                                  verbose=1,
                                  save_best_only=True,
                                  mode='min')
-    early = EarlyStopping(monitor="loss", mode="min", patience=5)
+    early = EarlyStopping(monitor="loss", mode="min", patience=1)
 
     # Training
     history = model.fit(train_flow,
-                        epochs=15,
+                        epochs=epoch,
                         verbose=1,
                         steps_per_epoch=math.ceil(
                             train_flow.samples/train_flow.batch_size),
@@ -62,3 +62,7 @@ def training(batch_size: int, lr, opt, loss_func):
     postprocess(history, "inception_v3", "loss")
     # Save the model
     model.save('../inception_v3.hdf5')
+    # Save log
+    file = open("inception_v3.log", 'a+')
+    file.write(history.history["accuracy"][epoch-1]+","+history.history["val_accuracy"][epoch-1]+","+history.history["loss"][epoch-1]+","+history.history["val_loss"][epoch-1]+"\n")
+    file.close()
