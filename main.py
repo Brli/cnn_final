@@ -25,10 +25,10 @@ def exec_resnet(augmentation=True, horizontal_flip=True, vertical_flip=False, ro
                           horizontal_flip=horizontal_flip, vertical_flip=horizontal_flip,
                           rotate=rotate, color_jitt=color_jitt, normalize=normalize)
     exec_result = timeit.repeat(func, number=1, repeat=5)
-    name_list="\0"
+    name_list=""
     if augmentation:
         if horizontal_flip:
-            name_list="horizontal_"
+            name_list+="horizontal_"
         if vertical_flip:
             name_list+="vertical_"
         if rotate:
@@ -62,10 +62,11 @@ def log_inceptionv3():
 
 base()
 # log_inceptionv3()
+exec_resnet(augmentation=False)
 exec_resnet()
 exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=True, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=True, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=True, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=False, normalize=True)
-exec_resnet(augmentation=False)
+

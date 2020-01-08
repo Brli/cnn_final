@@ -73,7 +73,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
     train_rgb_std = list(train_x.std(axis = (0,1,2)))
     
-    name_list="\0"
+    name_list=""
     transform_list=[]
     transform_list.append(transforms.ToPILImage())
     if augmentation:    
@@ -85,7 +85,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             transform_list.append(transforms.RandomVerticalFlip(p=0.5))
         if rotate:
             name_list+="rotate_"
-            transform_list.append(transforms.RandomRotation(degrees = (30,60)))
+            transform_list.append(transforms.RandomRotation(degrees = (0,90)))
         if color_jitt: # Randomly change the brightness, contrast and saturation of an image
             name_list+="color_"
             transform_list.append(transforms.ColorJitter(brightness=10, contrast=10, saturation=10))
@@ -95,7 +95,6 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             transform_list.append(transforms.Normalize(train_rgb_mean, train_rgb_std))
     else:
         name_list+="off"
-        transform_list.append(transforms.ToTensor())
 
     # train
     transform_train = transforms.Compose(transform_list)
@@ -204,10 +203,10 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
 
 
     # Training the model
-    def fit(epoch, model, data_x, data_y, batch_size = 8, phase = 'training', volatile = False):
-        if phase == 'training':
+    def fit(epoch, model, data_x, data_y, phase: str, volatile=False):
+        if phase == "training":
             model.train()
-        elif phase == 'validation':
+        elif phase == "validation":
             model.eval()
             volatile = True
 
@@ -224,7 +223,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             if torch.cuda.is_available():
                 batch_x, batch_y = batch_x.cuda(), batch_y.cuda()
 
-            if phase == 'training':
+            if phase == "training":
                 optimizer.zero_grad()
 
             outputs = model(batch_x)
@@ -234,7 +233,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             preds = outputs.data.max(dim = 1, keepdim = True)[1]
             correct += preds.eq(batch_y.data.view_as(preds)).cpu().sum().numpy()
 
-            if phase == 'training':
+            if phase == "training":
                 loss.backward()
                 optimizer.step()
 
@@ -250,8 +249,8 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     train_losses, train_accuracy = [], []
     val_losses, val_accuracy = [], []
     for epoch in range(0, epoches):
-        epoch_loss, epoch_accuracy = fit(epoch, model, train_x, train_y, batch_size, phase = 'training')
-        val_epoch_loss, val_epoch_accuracy = fit(epoch, model, val_x, val_y, batch_size, phase = 'validation')
+        epoch_loss, epoch_accuracy = fit(epoch, model, train_x, train_y, batch_size, phase="training")
+        val_epoch_loss, val_epoch_accuracy = fit(epoch, model, val_x, val_y, batch_size, phase="validation")
         # print('=' * 10)
         train_losses.append(epoch_loss)
         train_accuracy.append(epoch_accuracy)
@@ -284,7 +283,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
                  xytext=(0, 10),  # distance from text to points (x,y)
                  ha='center',
                  va='bottom')
-    plt.savefig("resnet18_"+name_list+"_loss.png")
+    plt.savefig("resnet18_"+name_list+"loss.png")
     plt.clf()
 
     plt.figure(2)
@@ -310,7 +309,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
                  xytext=(0, 10),  # distance from text to points (x,y)
                  ha='center',
                  va='bottom')
-    plt.savefig("resnet18_"+name_list+"_accuracy.png")
+    plt.savefig("resnet18_"+name_list+"accuracy.png")
     plt.clf()
 
     # prediction for tetsing set
@@ -341,7 +340,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
         print("--" * 10)
     print()
     print('testing accuracy: ', (correct/len(test_y)))
-    with open('restnet'+name_list+'.log', 'a+', encoding='utf-8') as log:
+    with open('restnet_'+name_list+'.log', 'a+', encoding='utf-8') as log:
         log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
     torch.cuda.empty_cache()
 
