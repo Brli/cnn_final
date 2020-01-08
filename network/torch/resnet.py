@@ -36,7 +36,8 @@ import torch.utils.data as Data
 traindict = {0 : 'buildings', 1 : 'forest', 2 : 'glacier', 3 : 'mountain', 4 : 'sea', 5 : 'street'}
 
 
-def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation=True): # loading training images
+def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation=True,
+               horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True): # loading training images
     train = pd.DataFrame([0] * sample_size + [1] * sample_size + [2] * sample_size + [3] * sample_size + [4] * sample_size + [5] * sample_size)
     img_flow = []
     for i in range(0, 6):
@@ -69,28 +70,37 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     train_x, val_x, train_y, val_y = train_test_split(train_x, train_y, test_size = 0.3, random_state = 13, stratify=train_y)
 
     """setup augmentation methods"""
-    def transform_method(horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True):
-        transform_list=[]
-        transform_list.append(transforms.ToPILImage())
+    train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
+    train_rgb_std = list(train_x.std(axis = (0,1,2)))
+    transform_list=[]
+    name_list="\0"
+    transform_list.append(transforms.ToPILImage())
+    if augmentation:    
         if horizontal_flip:
+            name_list+="horizontal_"
             transform_list.append(transforms.RandomHorizontalFlip(p=0.5))
         if vertical_flip:
+            name_list+="vertical_"
             transform_list.append(transforms.RandomVerticalFlip(p=0.5))
         if rotate:
+            name_list+="rotate_"
             transform_list.append(transforms.RandomRotation(degrees = (30,60)))
         if color_jitt: # Randomly change the brightness, contrast and saturation of an image
+            name_list+="color_"
             transform_list.append(transforms.ColorJitter(brightness=10, contrast=10, saturation=10))
         transform_list.append(transforms.ToTensor())
         if normalize:
+            name_list+="normalize_"
             transform_list.append(transforms.Normalize(train_rgb_mean, train_rgb_std))
-        return transform_list
+    else:
+        name_list+="off"
+        transform_list.append(transforms.ToTensor())
+
     # train
-    train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
-    train_rgb_std = list(train_x.std(axis = (0,1,2)))
-    transform_train = transforms.Compose(transform_method())
+    transform_train = transforms.Compose(transform_list)
 
     # valid, settings should be same as training
-    transform_valid = transforms.Compose(transform_method())
+    transform_valid = transforms.Compose(transform_list)
 
 
     # converting training images into torch format
@@ -273,7 +283,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
                  xytext=(0, 10),  # distance from text to points (x,y)
                  ha='center',
                  va='bottom')
-    plt.savefig("../resnet18_"+str(augmentation)+"_loss.png")
+    plt.savefig("resnet18_"+name_list+"_loss.png")
     plt.clf()
 
     plt.figure(2)
@@ -299,7 +309,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
                  xytext=(0, 10),  # distance from text to points (x,y)
                  ha='center',
                  va='bottom')
-    plt.savefig("../resnet18_"+str(augmentation)+"_accuracy.png")
+    plt.savefig("resnet18_"+name_list+"_accuracy.png")
     plt.clf()
 
     # prediction for tetsing set
@@ -330,7 +340,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
         print("--" * 10)
     print()
     print('testing accuracy: ', (correct/len(test_y)))
-    with open('restnet'+str(augmentation)+'.log', 'a+', encoding='utf-8') as log:
+    with open('restnet'+name_list+'.log', 'a+', encoding='utf-8') as log:
         log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
     torch.cuda.empty_cache()
 
