@@ -43,10 +43,10 @@ def exec_resnet(augmentation=True, horizontal_flip=True, vertical_flip=False, ro
     with open('resnet_'+name_list+'timing.log', 'a+', encoding='utf-8') as timing:
         timing.writelines(str(exec_result))
     
-    with open("resnet18_"+name_list+".csv", 'a+', encoding="utf-8") as resnet18:
-        resnet18.writelines("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss\n")
+    with open("resnet_"+name_list+".csv", 'a+', encoding="utf-8") as resnet18:
+        resnet18.writelines("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss,test_accuracy\n")
         resnet_log = pandas.read_csv('restnet_'+name_list+'.log', names=['accuracy', 'val_accuracy', 'loss', 'val_loss', 'test_accuracy'])
-        resnet18.writelines(str(mean(genfromtxt("resnet_"+name_list+"timing.log",delimiter=',',encoding='utf-8')))+","+str(mean(resnet_log['accuracy'].values))+","+str(mean(resnet_log['val_accuracy'].values))+","+str(mean(resnet_log['loss'].values))+","+str(mean(resnet_log['val_loss'].values))+"\n")
+        resnet18.writelines(str(mean(genfromtxt("resnet_"+name_list+"timing.log",delimiter=',',encoding='utf-8')))+","+str(mean(resnet_log['accuracy'].values))+","+str(mean(resnet_log['val_accuracy'].values))+","+str(mean(resnet_log['loss'].values))+","+str(mean(resnet_log['val_loss'].values))+","+str(mean(resnet_log['test_accuracy'].values))+"\n")
 
 def log_inceptionv3():
     def func():
@@ -62,10 +62,10 @@ def log_inceptionv3():
 
 # base()
 # log_inceptionv3()
-# exec_resnet(augmentation=False)
-# exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True)
+exec_resnet(augmentation=False)
+exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=True, normalize=False)
+exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True)
 exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=True, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=True, color_jitt=False, normalize=False)
-exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=True, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=False, normalize=True)

@@ -96,7 +96,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             name_list+="normalize_"
             transform_list.append(transforms.Normalize(train_rgb_mean, train_rgb_std))
     else:
-        name_list+="off"
+        name_list+="off_"
 
     # train
     transform_train = transforms.Compose(transform_list)
