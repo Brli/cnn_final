@@ -36,8 +36,8 @@ import torch.utils.data as Data
 traindict = {0 : 'buildings', 1 : 'forest', 2 : 'glacier', 3 : 'mountain', 4 : 'sea', 5 : 'street'}
 
 
-def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation=True,
-               horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True): # loading training images
+def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation=True, # loading training images
+               horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True): # augmentation variables
     train = pd.DataFrame([0] * sample_size + [1] * sample_size + [2] * sample_size + [3] * sample_size + [4] * sample_size + [5] * sample_size)
     img_flow = []
     for i in range(0, 6):
@@ -72,7 +72,9 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     """setup augmentation methods"""
     train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
     train_rgb_std = list(train_x.std(axis = (0,1,2)))
-    
+
+    print("start of augmentation")
+
     name_list=""
     transform_list=[]
     transform_list.append(transforms.ToPILImage())
@@ -101,7 +103,6 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
 
     # valid, settings should be same as training
     transform_valid = transforms.Compose(transform_list)
-
 
     # converting training images into torch format
     train_x = train_x.reshape(train_x.shape[0], train_x.shape[3], train_x.shape[1], train_x.shape[2])
@@ -148,6 +149,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             val_x = torch.cat((val_x, transform_valid(val_x[i]).unsqueeze(0)), 0) # append transformed images into old valid
         val_y = torch.cat((val_y,val_y), 0) # double val_y
 
+    print("end of augmentation")
 
     # loading the pretrained model
     model = models.resnet18(pretrained=True)
@@ -203,7 +205,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
 
 
     # Training the model
-    def fit(epoch, model, data_x, data_y, phase: str, volatile=False):
+    def fit(epoch, model, data_x, data_y, phase="training", volatile=False):
         if phase == "training":
             model.train()
         elif phase == "validation":
@@ -249,8 +251,8 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     train_losses, train_accuracy = [], []
     val_losses, val_accuracy = [], []
     for epoch in range(0, epoches):
-        epoch_loss, epoch_accuracy = fit(epoch, model, train_x, train_y, batch_size, phase="training")
-        val_epoch_loss, val_epoch_accuracy = fit(epoch, model, val_x, val_y, batch_size, phase="validation")
+        epoch_loss, epoch_accuracy = fit(epoch, model, train_x, train_y, phase="training")
+        val_epoch_loss, val_epoch_accuracy = fit(epoch, model, val_x, val_y, phase="validation")
         # print('=' * 10)
         train_losses.append(epoch_loss)
         train_accuracy.append(epoch_accuracy)
@@ -341,7 +343,7 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     print()
     print('testing accuracy: ', (correct/len(test_y)))
     with open('restnet_'+name_list+'.log', 'a+', encoding='utf-8') as log:
-        log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+"\n")
+        log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+","+str(correct/len(test_y))+"\n")
     torch.cuda.empty_cache()
 
 
