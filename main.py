@@ -25,6 +25,7 @@ def exec_resnet(augmentation=True, horizontal_flip=True, vertical_flip=False, ro
                           horizontal_flip=horizontal_flip, vertical_flip=horizontal_flip,
                           rotate=rotate, color_jitt=color_jitt, normalize=normalize)
     exec_result = timeit.repeat(func, number=1, repeat=5)
+    name_list="\0"
     if augmentation:
         if horizontal_flip:
             name_list="horizontal_"

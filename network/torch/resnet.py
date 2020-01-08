@@ -72,8 +72,9 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
     """setup augmentation methods"""
     train_rgb_mean = list(train_x.mean(axis = (0,1,2)))
     train_rgb_std = list(train_x.std(axis = (0,1,2)))
-    transform_list=[]
+    
     name_list="\0"
+    transform_list=[]
     transform_list.append(transforms.ToPILImage())
     if augmentation:    
         if horizontal_flip:
