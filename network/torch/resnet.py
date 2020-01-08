@@ -20,7 +20,7 @@ from sklearn.metrics import accuracy_score
 import torch
 from torch.autograd import Variable
 from torch.nn import Linear, ReLU, CrossEntropyLoss, Sequential, Conv2d, MaxPool2d, Module, Softmax, BatchNorm2d, Dropout, BatchNorm1d, ELU
-from torch.optim import Adagrad, Adam, SGD
+from torch.optim import Adam, SGD
 
 # torchvision for pre-trained models
 from torchvision import models
@@ -80,9 +80,9 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
             transform_list.append(transforms.RandomRotation(degrees = (30,60)))
         if color_jitt: # Randomly change the brightness, contrast and saturation of an image
             transform_list.append(transforms.ColorJitter(brightness=10, contrast=10, saturation=10))
+        transform_list.append(transforms.ToTensor())
         if normalize:
             transform_list.append(transforms.Normalize(train_rgb_mean, train_rgb_std))
-        transform_list.append(transforms.ToTensor())
         return transform_list
     # train
     train_rgb_mean = list(train_x.mean(axis = (0,1,2)))

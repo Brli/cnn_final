@@ -48,7 +48,7 @@ def training(batch_size: int, lr, opt, loss_func, epoch=25, sample_size=100):
                                  verbose=1,
                                  save_best_only=True,
                                  mode='min')
-    early = EarlyStopping(monitor="loss", mode="min", patience=1)
+    early = EarlyStopping(monitor="loss", mode="min", patience=5)
 
     # Training
     history = model.fit(train_flow,
