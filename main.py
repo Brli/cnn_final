@@ -4,7 +4,7 @@ from numpy import mean, genfromtxt
 from libs import configure_gpu, post_processing
 from network.tensor import inception_v3, inception_v4
 from network.torch import resnet
-import timeit, pandas
+import timeit, pandas, csv
 
 
 # configure_gpu
@@ -19,12 +19,14 @@ def base():
         base.writelines("batch_size,learning_rate,epoch,sample_size\n")
         base.writelines(str(batch_size)+","+str(lr)+","+str(epoch)+","+str(sample_size)+"\n")
 
-def exec_resnet(augmentation=True, horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True):
+def exec_resnet(sample_size=100, batch_size=32, lr=1e-4, epoches=25,
+                augmentation=True, horizontal_flip=True, vertical_flip=True, rotate=True, color_jitt=True, normalize=True):
     def func():
-        resnet.bulk_train(epoches=25, augmentation=augmentation,
+        resnet.bulk_train(sample_size=sample_size, batch_size=batch_size, lr=lr, epoches=epoches,
+                          augmentation=augmentation,
                           horizontal_flip=horizontal_flip, vertical_flip=vertical_flip,
                           rotate=rotate, color_jitt=color_jitt, normalize=normalize)
-    exec_result = timeit.timeit(func, number=1)
+    exec_result = timeit.repeat(func, number=1, repeat=5)
     name_list=""
     if augmentation:
         if horizontal_flip:
@@ -41,7 +43,8 @@ def exec_resnet(augmentation=True, horizontal_flip=True, vertical_flip=False, ro
         name_list="off_"
     
     with open('resnet_'+name_list+'timing.log', 'a+', encoding='utf-8') as timing:
-        timing.writelines(str(exec_result))
+        csv.writer(timing).writerow(exec_result)
+        # timing.writelines(str(exec_result))
     
     with open("resnet_"+name_list+".csv", 'a+', encoding="utf-8") as resnet18:
         resnet18.writelines("average_duration,average_accuracy,average_valid_accuracy,average_loss,average_valid_loss,test_accuracy\n")
@@ -60,12 +63,12 @@ def log_inceptionv3():
         log.write(str(mean(exec_inv3))+","+str(mean(inceptionv3_log['accuracy'].values))+","+str(mean(inceptionv3_log['val_accuracy'].values))+","+str(mean(inceptionv3_log['loss'].values))+","+str(mean(inceptionv3_log['val_loss'].values))+"\n")
 
 
-# base()
+base()
 # log_inceptionv3()
 exec_resnet(augmentation=False)
-exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=True, normalize=False)
-exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True)
+exec_resnet(horizontal_flip=True, vertical_flip=True, rotate=True, color_jitt=True, normalize=True)
 exec_resnet(horizontal_flip=True, vertical_flip=False, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=True, rotate=False, color_jitt=False, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=True, color_jitt=False, normalize=False)
+exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=True, normalize=False)
 exec_resnet(horizontal_flip=False, vertical_flip=False, rotate=False, color_jitt=False, normalize=True)

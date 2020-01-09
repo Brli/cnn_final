@@ -37,7 +37,7 @@ traindict = {0 : 'buildings', 1 : 'forest', 2 : 'glacier', 3 : 'mountain', 4 : '
 
 
 def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation=True, # loading training images
-               horizontal_flip=True, vertical_flip=False, rotate=True, color_jitt=True, normalize=True): # augmentation variables
+               horizontal_flip=True, vertical_flip=True, rotate=True, color_jitt=True, normalize=True): # augmentation variables
     train = pd.DataFrame([0] * sample_size + [1] * sample_size + [2] * sample_size + [3] * sample_size + [4] * sample_size + [5] * sample_size)
     img_flow = []
     for i in range(0, 6):
@@ -342,8 +342,12 @@ def bulk_train(sample_size=100, batch_size=32, lr=1e-4, epoches=25, augmentation
         print("--" * 10)
     print()
     print('testing accuracy: ', (correct/len(test_y)))
+
+    # write result to log
     with open('restnet_'+name_list+'.log', 'a+', encoding='utf-8') as log:
         log.writelines(str(epoch_accuracy)+","+str(val_epoch_accuracy)+","+str(epoch_loss)+","+str(val_epoch_loss)+","+str(correct/len(test_y))+"\n")
+    # export model
+    torch.save(model.state_dict(), 'restnet_'+name_list+'.pth')
     torch.cuda.empty_cache()
 
 
